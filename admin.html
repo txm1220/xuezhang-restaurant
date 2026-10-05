@@ -20,17 +20,31 @@
     </header>
 
     <nav class="admin-tabs" id="adminTabs">
-      <button class="tab-chip on" data-tab="tabArchive">点单归档</button>
+      <button class="tab-chip on" data-tab="tabOnline">线上点单</button>
+      <button class="tab-chip" data-tab="tabArchive">手动归档</button>
       <button class="tab-chip" data-tab="tabGuests">客人档案</button>
       <button class="tab-chip" data-tab="tabSummary">晚宴汇总</button>
       <button class="tab-chip" data-tab="tabBackup">数据备份</button>
     </nav>
 
+    <!-- 线上点单收件箱 -->
+    <section class="panel on" id="tabOnline">
+      <div class="card">
+        <h3>线上点单</h3>
+        <p class="card-sub">客人在菜单页点「直接提交给主人」，订单会出现在这里（每 15 秒自动刷新）。勾选后点归档，进入客人档案。</p>
+        <div class="stat-line" id="onlineStat">加载中…</div>
+        <div id="onlineList"></div>
+        <div class="btn-row" id="onlineArchiveRow" style="display:none;">
+          <button class="btn btn-primary" id="btnArchiveOnline">归档选中的点单</button>
+        </div>
+      </div>
+    </section>
+
     <!-- 点单归档 -->
-    <section class="panel on" id="tabArchive">
+    <section class="panel" id="tabArchive">
       <div class="card">
         <h3>粘贴点菜单</h3>
-        <p class="card-sub">从微信复制客人发来的点单卡文字，粘贴到这里 —— 一次可以贴好几张，会自动识别。</p>
+        <p class="card-sub">从微信复制客人发来的点单卡<b>文字</b>，粘贴到这里——一次可以贴好几张，会自动识别。<br>⚠️ 客人只发图片的话，请让 ta 在结果页点「复制文字」再发一次文字版，图片没法归档。</p>
         <textarea class="form-textarea tall" id="pasteBox" placeholder="【学长餐厅·点菜单】&#10;客人：王小雨&#10;日期：2026-10-04 18:30&#10;…"></textarea>
         <div class="btn-row">
           <button class="btn btn-primary" id="btnParse">解析预览</button>
@@ -93,6 +107,7 @@
 
   <script src="menu-data.js?v=6"></script>
   <script src="card.js"></script>
-  <script src="admin.js"></script>
+  <script src="cloud-config.js"></script>
+  <script src="admin.js?v=3"></script>
 </body>
 </html>
