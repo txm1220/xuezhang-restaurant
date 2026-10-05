@@ -73,7 +73,11 @@
         '<div class="dish-head"><span class="dish-name">' + esc(it.name) + '</span>' + tags + '</div>' +
         (it.en ? '<div class="dish-en">' + esc(it.en) + '</div>' : '') +
         (it.desc ? '<div class="dish-desc">' + esc(it.desc) + '</div>' : '') +
-        '<span class="qty-badge"></span></div>';
+        '<div class="row-stepper">' +
+        '<button type="button" class="rs-btn" data-act="minus" aria-label="减少">−</button>' +
+        '<span class="rs-num">0</span>' +
+        '<button type="button" class="rs-btn rs-plus" data-act="plus" aria-label="增加">＋</button>' +
+        '</div></div>';
     }).join('');
 
     wrap.innerHTML = head + items;
@@ -97,6 +101,22 @@
 
   /* ---------- 点菜 ---------- */
   bodyEl.addEventListener('click', function (ev) {
+    // 行内加减按钮
+    var rsBtn = ev.target.closest ? ev.target.closest('.rs-btn') : null;
+    if (rsBtn) {
+      var rsRow = rsBtn.closest('.dish');
+      var rsName = rsRow.getAttribute('data-name');
+      if (!cart[rsName]) return;
+      if (rsBtn.getAttribute('data-act') === 'plus') cart[rsName].qty++;
+      else {
+        cart[rsName].qty--;
+        if (cart[rsName].qty <= 0) delete cart[rsName];
+      }
+      updateBadges();
+      updateBar();
+      return;
+    }
+    // 整行点击 = 加一份
     var row = ev.target.closest ? ev.target.closest('.dish') : null;
     if (!row) return;
     var name = row.getAttribute('data-name');
@@ -119,16 +139,14 @@
   function updateBadges() {
     document.querySelectorAll('.dish').forEach(function (row) {
       var n = row.getAttribute('data-name');
-      var badge = row.querySelector('.qty-badge');
       var q = cart[n] ? cart[n].qty : 0;
+      var st = row.querySelector('.row-stepper');
+      if (!st) return;
       if (q > 0) {
-        badge.classList.remove('show');
-        void badge.offsetWidth;            // 重触发动画
-        badge.textContent = q;
-        badge.classList.add('show');
+        st.classList.add('show');
+        st.querySelector('.rs-num').textContent = q;
       } else {
-        badge.classList.remove('show');
-        badge.textContent = '';
+        st.classList.remove('show');
       }
     });
   }
