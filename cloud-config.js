@@ -7,6 +7,6 @@
    ============================================================ */
 
 var XZ_CLOUD = {
-  url: "",   // 例如 https://xxxx.supabase.co
-  key: ""    // anon public key（很长的 eyJ... 开头）
+  url: "https://lyntvhslakkvhpwwtuyh.supabase.co",
+  key: "sb_publishable__jVNFgsYj2K5eiYRad_43w_dQC7XmcD"
 };
