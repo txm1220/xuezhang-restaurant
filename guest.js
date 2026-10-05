@@ -142,6 +142,8 @@
     var c = cartCount();
     $('bbCount').textContent = c.items;
     $('bbQty').textContent = c.qty;
+    // 没点菜=去点菜；点了菜=去确认提交
+    $('btnOpenOrder').textContent = c.items ? '确认点单' : '开始点单';
   }
 
   /* ---------- 抽屉开关 ---------- */
