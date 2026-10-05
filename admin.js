@@ -60,8 +60,117 @@
       });
       if (t.getAttribute('data-tab') === 'tabSummary') renderSummary();
       if (t.getAttribute('data-tab') === 'tabGuests') renderGuests();
+      if (t.getAttribute('data-tab') === 'tabOnline') fetchOnline();
     });
   });
+
+  /* ============================================================
+     线上点单（Supabase 收件箱）
+     ============================================================ */
+  var onlineRows = [];   // 云端拉到的点单
+  var onlineTimer = null;
+
+  function cloudHeaders() {
+    return {
+      'apikey': XZ_CLOUD.key,
+      'Authorization': 'Bearer ' + XZ_CLOUD.key
+    };
+  }
+
+  function archivedCloudIds() {
+    var s = {};
+    data.forEach(function (o) { if (o.cloudId) s[o.cloudId] = 1; });
+    return s;
+  }
+
+  function fetchOnline() {
+    if (typeof XZ_CLOUD === 'undefined' || !XZ_CLOUD.url || !XZ_CLOUD.key) {
+      $('onlineStat').textContent = '云端暂未配置（联系助手开通后即可自动收单）';
+      return;
+    }
+    fetch(XZ_CLOUD.url + '/rest/v1/orders?select=*&order=created_at.desc&limit=50', { headers: cloudHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (rows) {
+        onlineRows = Array.isArray(rows) ? rows : [];
+        renderOnline();
+      })
+      .catch(function () {
+        $('onlineStat').textContent = '网络不顺，稍后自动重试…';
+      });
+  }
+
+  function renderOnline() {
+    var done = archivedCloudIds();
+    var fresh = onlineRows.filter(function (r) { return !done[r.id]; });
+    $('onlineStat').textContent = '共 ' + onlineRows.length + ' 条线上点单 · ' + fresh.length + ' 条待归档 · 更新于 ' +
+      new Date().toTimeString().slice(0, 5);
+
+    if (!onlineRows.length) {
+      $('onlineList').innerHTML = '<div class="empty-tip">还没有线上点单——客人在菜单页点「直接提交给主人」后会出现在这里</div>';
+      $('onlineArchiveRow').style.display = 'none';
+      return;
+    }
+
+    var html = onlineRows.map(function (r) {
+      var isDone = !!done[r.id];
+      var dishes = (r.dishes || []).map(function (d) {
+        return (d.name || '') + (d.option ? '（' + d.option + '）' : '') + ' ×' + (d.qty || 1);
+      }).join('；');
+      var meta = [];
+      if (r.restrictions) meta.push('忌口：' + r.restrictions);
+      if (r.prefs) meta.push('口味：' + r.prefs);
+      if (r.note) meta.push('备注：' + r.note);
+      var time = (r.date_text || '').slice(5);
+      return '<div class="preview-item' + (isDone ? '" style="opacity:.55' : '') + '">' +
+        '<div class="pv-head">' +
+        (isDone ? '<span class="pv-flag ok">已归档</span>' :
+          '<input type="checkbox" class="online-ck" data-id="' + r.id + '" checked style="margin-right:8px;">') +
+        '<span class="pv-name">' + esc(r.guest_name || '神秘客人') + '</span>' +
+        '<span style="font-family:var(--sans);font-size:11px;color:var(--muted);">' + esc(time) + '</span></div>' +
+        '<div class="pv-dishes">' + esc(dishes) + (meta.length ? '<br>' + esc(meta.join('　')) : '') + '</div></div>';
+    }).join('');
+
+    $('onlineList').innerHTML = html;
+    $('onlineArchiveRow').style.display = fresh.length ? 'flex' : 'none';
+  }
+
+  $('btnArchiveOnline').addEventListener('click', function () {
+    var ids = [];
+    document.querySelectorAll('.online-ck:checked').forEach(function (ck) {
+      ids.push(parseInt(ck.getAttribute('data-id'), 10));
+    });
+    if (!ids.length) { toast('先勾选要归档的点单'); return; }
+    var done = archivedCloudIds();
+    var added = 0;
+    onlineRows.forEach(function (r) {
+      if (ids.indexOf(r.id) < 0 || done[r.id]) return;
+      data.push({
+        id: XZ.uid(), addedTs: Date.now(), cloudId: r.id,
+        date: r.date || (r.date_text || '').slice(0, 10),
+        dateText: r.date_text || r.date || '',
+        name: r.guest_name || '神秘客人',
+        restrictions: r.restrictions || '',
+        prefs: (r.prefs || '').split(/[;；、]/).map(function (s) { return s.trim(); }).filter(Boolean),
+        note: r.note || '',
+        dishes: r.dishes || []
+      });
+      added++;
+    });
+    if (!added) { toast('没有新的可归档点单'); return; }
+    save();
+    toast('已归档 ' + added + ' 条线上点单');
+    renderOnline();
+    renderGuests();
+    renderSummaryOptions();
+    var guestChip = document.querySelector('.tab-chip[data-tab="tabGuests"]');
+    if (guestChip) guestChip.click();
+  });
+
+  /* 每 15 秒自动刷新（仅当收件箱页签在显示时请求） */
+  onlineTimer = setInterval(function () {
+    var panel = document.getElementById('tabOnline');
+    if (panel && panel.classList.contains('on')) fetchOnline();
+  }, 15000);
 
   /* ============================================================
      点单归档
@@ -131,6 +240,9 @@
     $('archiveRow').style.display = 'none';
     renderGuests();
     renderSummaryOptions();   // 日期下拉同步新增的晚宴
+    // 归档成功后直接跳到「客人档案」，让结果立刻可见
+    var guestChip = document.querySelector('.tab-chip[data-tab="tabGuests"]');
+    if (guestChip) guestChip.click();
   });
 
   /* ============================================================
@@ -388,5 +500,6 @@
   /* ---------- 初始化 ---------- */
   renderGuests();
   renderSummaryOptions();
+  fetchOnline();
 
 })();
