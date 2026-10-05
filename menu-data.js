@@ -33,15 +33,15 @@ const MENU = {
       note: "",
       items: [
         {
-          name: "慢煮溏心蛋 · 葱油鱼子酱",
-          en: "Onsen Egg, Scallion Oil & Caviar",
-          desc: "63.5°C 温泉蛋，现熬葱油，鲟鱼籽点缀",
+          name: "慢煮溏心蛋 · 鱼子酱",
+          en: "Onsen Egg & Caviar",
+          desc: "63.5°C 温泉蛋，鲟鱼籽点缀",
           tags: ["推荐"]
         },
         {
-          name: "现烤酸面包 · 发酵黄油",
-          en: "Sourdough & Cultured Butter",
-          desc: "天然酵种隔夜发酵，外壳脆响，配海盐发酵黄油",
+          name: "现烤酸面包",
+          en: "Sourdough & Butter",
+          desc: "天然酵种隔夜发酵，外壳脆响，配海盐黄油",
           tags: []
         },
         {
@@ -103,15 +103,15 @@ const MENU = {
           tags: ["可素"]
         },
         {
-          name: "法式洋葱汤 · 芝士封盖",
-          en: "French Onion Soup, gratinéed",
-          desc: "洋葱慢炒至焦糖化，焗至芝士拉丝",
+          name: "法式洋葱汤 · 酥皮封盖",
+          en: "French Onion Soup, Pastry Lid",
+          desc: "洋葱慢炒至焦糖化，酥皮封盖焗烤",
           tags: []
         },
         {
-          name: "味噌烤南瓜浓汤",
-          en: "Roasted Pumpkin & Miso Soup",
-          desc: "白味噌提鲜，烤南瓜打泥，温润顺口",
+          name: "烤南瓜浓汤",
+          en: "Roasted Pumpkin Soup",
+          desc: "烤南瓜打泥，温润顺口",
           tags: ["可素"]
         }
       ]
@@ -160,8 +160,8 @@ const MENU = {
           tags: ["海鲜"]
         },
         {
-          name: "地中海风味海鲜饭",
-          en: "Mediterranean Seafood Paella",
+          name: "西班牙风味海鲜饭",
+          en: "Spanish Seafood Paella",
           desc: "藏红花打底，大虾青口鱿鱼铺满，锅底结出焦香饭焦",
           tags: ["招牌", "海鲜"]
         },
@@ -208,12 +208,6 @@ const MENU = {
           en: "The House Sandwich",
           desc: "主厨当日手作，馅料随心配，即兴组合",
           tags: ["推荐"]
-        },
-        {
-          name: "白灼时蔬 · XO酱",
-          en: "Blanched Seasonal Greens, XO Sauce",
-          desc: "当日时令青菜，配自制 XO 酱",
-          tags: ["可素"]
         }
       ]
     },
@@ -277,6 +271,7 @@ const MENU = {
     }
   ]
 };
+
 
 /* 菜名速查表（按菜名找所属分节），由下方代码自动生成，不用手动维护 */
 const DISH_INDEX = {};
