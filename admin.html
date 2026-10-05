@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FAF6EC">
+  <title>学长餐厅 · 主人后台</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+  <link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body>
+
+  <div class="admin-wrap">
+
+    <header class="admin-header menu-header" style="padding-top:0;">
+      <div class="mh-cn">学长餐厅</div>
+      <div class="mh-en">HOST CONSOLE · 主人后台</div>
+      <div class="mh-ornament">✦</div>
+      <div class="mh-sub">归档点单 · 记住每位客人的口味</div>
+    </header>
+
+    <nav class="admin-tabs" id="adminTabs">
+      <button class="tab-chip on" data-tab="tabArchive">点单归档</button>
+      <button class="tab-chip" data-tab="tabGuests">客人档案</button>
+      <button class="tab-chip" data-tab="tabSummary">晚宴汇总</button>
+      <button class="tab-chip" data-tab="tabBackup">数据备份</button>
+    </nav>
+
+    <!-- 点单归档 -->
+    <section class="panel on" id="tabArchive">
+      <div class="card">
+        <h3>粘贴点菜单</h3>
+        <p class="card-sub">从微信复制客人发来的点单卡文字，粘贴到这里 —— 一次可以贴好几张，会自动识别。</p>
+        <textarea class="form-textarea tall" id="pasteBox" placeholder="【学长餐厅·点菜单】&#10;客人：王小雨&#10;日期：2026-10-04 18:30&#10;…"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnParse">解析预览</button>
+        </div>
+        <div id="previewList"></div>
+        <div class="btn-row" id="archiveRow" style="display:none;">
+          <button class="btn btn-primary" id="btnArchive">归档有效点单</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 客人档案 -->
+    <section class="panel" id="tabGuests">
+      <input class="search-input" id="guestSearch" placeholder="搜客人昵称…">
+      <div class="stat-line" id="guestStat"></div>
+      <div class="guest-cards" id="guestCards"></div>
+    </section>
+
+    <!-- 晚宴汇总 -->
+    <section class="panel" id="tabSummary">
+      <div class="card">
+        <h3>给主厨的汇总</h3>
+        <p class="card-sub">按日期汇总所有客人的点单，生成后厨备菜单，可以直接拿给主厨看。</p>
+        <select class="date-pick" id="sumDate"></select>
+        <div id="sumArea"></div>
+      </div>
+    </section>
+
+    <!-- 数据备份 -->
+    <section class="panel" id="tabBackup">
+      <div class="card">
+        <h3>备份说明</h3>
+        <p class="backup-tip">
+          所有归档数据都保存在「你现在这台设备的浏览器」里，换设备或清理浏览器会丢。<br>
+          建议每隔一段时间导出一个备份文件存在微信收藏或网盘里；换手机/电脑时再导入即可。<br><br>
+          客人那边不受影响：他们的点单记录存在他们自己的手机上。
+        </p>
+      </div>
+      <div class="card">
+        <h3>导出 / 导入</h3>
+        <p class="card-sub">导出为 JSON 备份文件；导入时与现有数据自动合并（按点单编号去重）。</p>
+        <div class="btn-row">
+          <button class="btn" id="btnExport">导出备份</button>
+          <button class="btn" id="btnImport">导入备份</button>
+          <input type="file" id="importFile" accept=".json,application/json" style="display:none;">
+        </div>
+      </div>
+      <div class="card">
+        <h3>危险操作</h3>
+        <p class="card-sub">清空本机的全部归档数据（不影响已导出的备份文件）。</p>
+        <div class="btn-row">
+          <button class="btn btn-danger" id="btnWipe">清空全部数据</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="menu-data.js?v=6"></script>
+  <script src="card.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
