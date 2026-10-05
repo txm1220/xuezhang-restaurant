@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FAF6EC">
+  <title>学长餐厅 · 菜单</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+  <link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body>
+
+  <div class="wrap">
+
+    <header class="menu-header">
+      <div class="mh-cn" id="mhName">学长餐厅</div>
+      <div class="mh-en" id="mhEn">XUEZHANG · CHEF'S TABLE</div>
+      <div class="mh-ornament">✦</div>
+      <div class="mh-sub"><b id="mhSub">中西融合创意菜</b> · <span id="mhSeason">秋季菜单 · Autumn 2026</span></div>
+      <div class="mh-sub-en" id="mhSubEn"></div>
+
+      <div class="chef-block">
+        <div class="chef-ring">
+          <img src="assets/chef.jpg?v=4" alt="主厨">
+        </div>
+        <svg class="chef-hat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"/>
+          <path d="M6 17h12"/>
+        </svg>
+        <div class="chef-title">主厨</div>
+        <div class="chef-en">THE CHEF</div>
+      </div>
+    </header>
+
+    <div class="hint-bar" id="hintBar">
+      <span>👇 点菜品加入点单，完成后生成「点菜单卡」发给主人即可</span>
+      <button class="hb-close" id="hintClose" aria-label="知道了">✕</button>
+    </div>
+
+    <nav class="section-nav" id="sectionNav"></nav>
+
+    <main id="menuBody"></main>
+
+    <footer class="menu-footer">
+      <div class="mf-note" id="mfNote">仅供朋友预订 · 菜单随时令与主厨心情调整</div>
+      <div class="mf-credit">Menu subject to chef's mood &amp; market availability</div>
+      <button class="history-link" id="btnHistory">我的点单记录</button>
+    </footer>
+
+  </div>
+
+  <!-- 底部点单条 -->
+  <div class="bottom-bar" id="bottomBar">
+    <div class="bb-info">已点 <b id="bbCount">0</b> 道 · <span id="bbQty">0</span> 份</div>
+    <button class="bb-btn" id="btnOpenOrder">开始点单</button>
+  </div>
+
+  <!-- 点单表单抽屉 -->
+  <div class="sheet" id="sheetOrder">
+    <div class="sheet-panel">
+      <div class="sheet-grab"></div>
+      <div class="sheet-head">
+        <div class="sheet-title">我 的 点 单</div>
+        <button class="sheet-close" data-close="sheetOrder">✕</button>
+      </div>
+
+      <div id="cartList"></div>
+
+      <div class="form-row">
+        <label class="form-label">客人昵称（主人靠这个记住你的口味）</label>
+        <input class="form-input" id="fName" placeholder="例如：王小雨" maxlength="12">
+      </div>
+      <div class="form-row">
+        <label class="form-label">忌口 / 过敏</label>
+        <input class="form-input" id="fRestr" placeholder="例如：不吃香菜、不吃辣、海鲜过敏；没有可不填" maxlength="50">
+      </div>
+      <div class="form-row">
+        <label class="form-label">口味爱好（可多选）</label>
+        <div class="chips" id="prefChips"></div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">给主人的话（可不填）</label>
+        <textarea class="form-textarea" id="fNote" placeholder="例如：这次带了朋友来，量可以大一点" maxlength="80"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnClear">清空重选</button>
+        <button class="btn btn-primary" id="btnGen">生成点菜单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 点单卡结果抽屉 -->
+  <div class="sheet" id="sheetResult">
+    <div class="sheet-panel">
+      <div class="sheet-grab"></div>
+      <div class="sheet-head">
+        <div class="sheet-title">点 单 菜 卡</div>
+        <button class="sheet-close" data-close="sheetResult">✕</button>
+      </div>
+
+      <img class="result-img" id="cardImg" alt="点菜单卡">
+      <div class="result-tip">
+        长按上方图片可保存 / 转发给主人<br>
+        或点「复制文字」，去微信里直接粘贴
+      </div>
+      <textarea class="copy-source" id="copySource" readonly></textarea>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnBackEdit">返回修改</button>
+        <button class="btn btn-primary" id="btnCopy">复制文字</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 历史记录抽屉 -->
+  <div class="sheet" id="sheetHistory">
+    <div class="sheet-panel">
+      <div class="sheet-grab"></div>
+      <div class="sheet-head">
+        <div class="sheet-title">我 的 记 录</div>
+        <button class="sheet-close" data-close="sheetHistory">✕</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="menu-data.js?v=6"></script>
+  <script src="card.js"></script>
+  <script src="guest.js"></script>
+</body>
+</html>
