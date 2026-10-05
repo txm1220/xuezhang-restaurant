@@ -17,6 +17,7 @@
   var cart = {};      // 菜名 -> { name, section, option, qty }
   var prefs = [];     // 选中的口味标签
   var cardText = '';  // 最近生成的点单卡文字
+  var lastOrder = null; // 最近一次生成的订单（云端提交用）
 
   var TAGCLS = { "招牌": "tag-star", "推荐": "tag-rec", "可素": "tag-veg", "辣": "tag-spicy", "微辣": "tag-spicy" };
 
@@ -272,11 +273,60 @@
     lsSet('xz_name', name);
 
     cardText = XZ.formatCard(order);
+    lastOrder = order;
     $('copySource').value = cardText;
     $('copySource').classList.remove('show');
+    // 重置提交按钮
+    var sb = $('btnSubmit');
+    sb.disabled = false;
+    sb.textContent = '直接提交给主人';
     drawCard(order, function (url) {
       $('cardImg').src = url;
       openSheet('sheetResult');
+    });
+  });
+
+  /* ---------- 直接提交给主人（云端） ---------- */
+  $('btnSubmit').addEventListener('click', function () {
+    if (!lastOrder) return;
+    if (typeof XZ_CLOUD === 'undefined' || !XZ_CLOUD.url || !XZ_CLOUD.key) {
+      toast('云端暂未开通，请用「复制文字」发给主人');
+      return;
+    }
+    var btn = $('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = '提交中…';
+    var o = lastOrder;
+    fetch(XZ_CLOUD.url + '/rest/v1/orders', {
+      method: 'POST',
+      headers: {
+        'apikey': XZ_CLOUD.key,
+        'Authorization': 'Bearer ' + XZ_CLOUD.key,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        guest_name: o.name,
+        date: o.dateText.slice(0, 10),
+        date_text: o.dateText,
+        restrictions: o.restrictions,
+        prefs: (o.prefs || []).join('；'),
+        note: o.note,
+        dishes: o.dishes
+      })
+    }).then(function (r) {
+      if (r.ok) {
+        btn.textContent = '已提交 ✓';
+        toast('已提交！主人后台马上能看到');
+      } else {
+        btn.disabled = false;
+        btn.textContent = '直接提交给主人';
+        toast('提交失败，请改用「复制文字」');
+      }
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = '直接提交给主人';
+      toast('网络不顺，请改用「复制文字」');
     });
   });
 
